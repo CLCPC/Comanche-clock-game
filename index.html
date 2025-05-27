@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comanche Clock Game</title>
+  <style>
+    body {
+      font-family: Noto Sans, sans-serif;
+      text-align: center;
+      background-color: #edf6f9;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #003049;
+    }
+    #clock {
+      font-size: 8em;
+      margin: 40px;
+    }
+    #analog-clock img {
+      width: 600px;
+      height: auto;
+      margin: 40px;
+    }
+    .choice {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 24px;
+      font-size: 1.4em;
+      border: 2px solid #003049;
+      background-color: #fff;
+      color: #003049;
+      cursor: pointer;
+      border-radius: 8px;
+      width: fit-content;
+    }
+    .correct {
+      background-color: #90be6d;
+    }
+    .incorrect {
+      background-color: #f28482;
+    }
+    button#toggle,
+    button[onclick="generateQuestion()"] {
+      margin: 20px;
+      background-color: #219ebc;
+      color: #fff;
+      border: none;
+      padding: 20px 40px;
+      font-size: 1.6em;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #logo {
+      width: 240px;
+      margin-top: 40px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hʉʉtʉkʉ̠ sitʉ nahayu̠?</h1>
+  <button id="toggle" onclick="toggleClockType()">Switch Clock Type</button>
+  <div id="clock"></div>
+  <div id="analog-clock" style="display:none;"></div>
+  <div id="choices"></div>
+  <div id="feedback"></div>
+  <button onclick="generateQuestion()">Next</button>
+  <img id="logo" src="clock_assets/CLCPC_logo.png" alt="CLCPC Logo">
+
+  <script>
+    const timeWords = {
+      1: "Sʉmʉkʉ̠ ma nahanu̠",
+      2: "Wahatʉkʉ̠ ma nahanu̠",
+      3: "Pahitʉkʉ̠ ma nahanu̠",
+      4: "Hayarokwetʉkʉ̠ ma nahanu̠",
+      5: "Moʔobetʉkʉ̠ ma nahanu̠",
+      6: "Nabaitʉkʉ̠ ma nahanu̠",
+      7: "Tatsʉkwi̠tʉkʉ̠ ma nahanu̠",
+      8: "Namewatsʉkwi̠tʉkʉ̠ ma nahanu̠",
+      9: "Wʉhmi̠natʉkʉ̠ ma nahanu̠",
+      10: "Sʉmarʉkʉ̠ ma nahanu̠",
+      11: "Sʉmʉmatoʔikʉtʉkʉ̠ ma nahanu̠",
+      12: "Tokwetabenikʉ̠ ma nahanu̠"
+    };
+
+    let useAnalog = Math.random() < 0.5;
+
+    function toggleClockType() {
+      useAnalog = !useAnalog;
+      generateQuestion();
+    }
+
+    function generateQuestion() {
+      const hour = Math.floor(Math.random() * 12) + 1;
+      const correct = timeWords[hour];
+      const choices = new Set([correct]);
+
+      while (choices.size < 4) {
+        const randHour = Math.floor(Math.random() * 12) + 1;
+        choices.add(timeWords[randHour]);
+      }
+
+      const shuffled = Array.from(choices).sort(() => Math.random() - 0.5);
+      const clockDiv = document.getElementById('clock');
+      const analogDiv = document.getElementById('analog-clock');
+      const choiceContainer = document.getElementById('choices');
+      const feedback = document.getElementById('feedback');
+
+      clockDiv.style.display = useAnalog ? 'none' : 'block';
+      analogDiv.style.display = useAnalog ? 'block' : 'none';
+
+      if (useAnalog) {
+        analogDiv.innerHTML = `<img src="clock_assets/clock${hour}.png" alt="Clock ${hour}">`;
+      } else {
+        clockDiv.textContent = `${hour}:00`;
+      }
+
+      choiceContainer.innerHTML = '';
+      feedback.textContent = '';
+
+      shuffled.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice;
+        btn.onclick = () => {
+          if (choice === correct) {
+            btn.classList.add('correct');
+            feedback.textContent = `✅ ${correct}`;
+          } else {
+            btn.classList.add('incorrect');
+            feedback.textContent = `❌ ${correct}`;
+          }
+        };
+        choiceContainer.appendChild(btn);
+      });
+    }
+
+    generateQuestion();
+  </script>
+</body>
+</html>
